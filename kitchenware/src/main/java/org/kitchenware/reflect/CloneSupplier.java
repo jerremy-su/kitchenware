@@ -6,8 +6,10 @@ import java.util.logging.Logger;
 
 public interface CloneSupplier<T> extends Cloneable{
 
+	static final CloneableHandler handler = new CloneableHandler();
+	
 	default T cloneTo() {
-		return null;
+		return (T) CloneableHandler.invokeClone(this);
 	}
 
 	static final class CloneableHandler{
