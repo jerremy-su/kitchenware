@@ -21,7 +21,7 @@ public class MethodDescribe extends DefaultAnnotationDescribe<MethodDescribe> im
 	Class [] parameterTypes;
 	
 	final MethodId id;
-	public MethodDescribe(
+	MethodDescribe(
 			@NotNull final MethodId id) {
 		this.id = id;
 	}

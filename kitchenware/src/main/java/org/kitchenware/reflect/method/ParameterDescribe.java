@@ -8,7 +8,7 @@ public class ParameterDescribe extends DefaultAnnotationDescribe<ParameterDescri
 	final int parameterIndex;
 	final Class type;
 	
-	public ParameterDescribe(
+	ParameterDescribe(
 			final Class type, @NotNull final int parameterIndex){
 		
 		Asserts.assertNotNull(type, "'type' cannot be null.");
