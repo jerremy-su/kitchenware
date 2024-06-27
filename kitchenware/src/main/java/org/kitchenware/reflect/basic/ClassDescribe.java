@@ -1,4 +1,4 @@
-package org.kitchenware.object.transport.rpc.flow;
+package org.kitchenware.reflect.basic;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -9,47 +9,53 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.kitchenware.express.annotation.NotNull;
 import org.kitchenware.express.util.ArrayCollect;
 import org.kitchenware.express.util.ArrayObjects;
 import org.kitchenware.express.util.EmptyArray;
 
 import sun.misc.Unsafe;
 
-public class ClassFlow {
+public class ClassDescribe {
 	static final Package jutilPackage = Package.getPackage("java.util");
-	static final Unsafe unsafe;
-	static{
-		try {
-			Field f = Unsafe.class.getDeclaredField("theUnsafe");
-			f.setAccessible(true);
-			unsafe = (Unsafe)f.get(null);
-		} catch (Throwable e) {
-			throw new RuntimeException(e.getMessage(), e);
+	
+	final static Map<Class, ClassDescribe> tbmdContext = new ConcurrentHashMap<>();
+	
+	public static ClassDescribe getDescribe(
+			@NotNull Class clazz){
+		if(clazz == null) {
+			return null;
 		}
+		ClassDescribe md = tbmdContext.get(clazz);
+		if (md == null) {
+			tbmdContext.put(clazz, md = new ClassDescribe(clazz));
+		}
+		return md;
 	}
 	
 	final Class type;
 	final Class componentType;
-	final Map<String, FieldFlow> fields = new LinkedHashMap<String, FieldFlow>();
-	final FieldFlow [] requiredFields;
+	final Map<String, FieldDescribe> fields = new LinkedHashMap<String, FieldDescribe>();
+	final FieldDescribe [] requiredFields;
 	
 	final Map<String, Method [] > declaredMethods = new LinkedHashMap<>();
 	
 	final boolean typeInterface;
 	final boolean typeArray;
 	Constructor constructor;
-	ClassFlow parent;
-	public ClassFlow(Class type){
+	ClassDescribe parent;
+	ClassDescribe(Class type){
 		this.typeArray = type.isArray();
 		this.typeInterface = type.isInterface();
 		this.type = type;
 		if (typeArray) {
 			componentType = type.getComponentType(); 
-			this.requiredFields = EmptyArray.getInstance().array(FieldFlow.class);
+			this.requiredFields = EmptyArray.getInstance().array(FieldDescribe.class);
 		}else{
 			componentType = null;
-			List<FieldFlow> requiredFields = new ArrayList<>();
+			List<FieldDescribe> requiredFields = new ArrayList<>();
 			for (Field f : type.getDeclaredFields()) {
 				if (Modifier.isStatic(f.getModifiers())
 						|| (!type.getPackage().equals(jutilPackage) && Modifier.isTransient(f.getModifiers()))) {
@@ -59,13 +65,13 @@ public class ClassFlow {
 					remodifyFieldFinalProperty(f);
 				}
 				f.setAccessible(true);
-				FieldFlow field = new FieldFlow(f);
+				FieldDescribe field = new FieldDescribe(f);
 				fields.put(f.getName(), field);
 				if(field.isRequired()) {
 					requiredFields.add(field);
 				}
 			}
-			this.requiredFields = ArrayCollect.get(FieldFlow.class).toArray(requiredFields);
+			this.requiredFields = ArrayCollect.get(FieldDescribe.class).toArray(requiredFields);
 			try {
 				Constructor constructor = type.getDeclaredConstructor();
 				constructor.setAccessible(true);
@@ -75,10 +81,7 @@ public class ClassFlow {
 		Class superType = type.getSuperclass();
 		/**------------------B BUG2433(Jerremy 2018.06.19)------------------*/
 		if (superType != null ) {
-			ClassFlow parentMetadata = ObjectFlow.tbmdContext.get(superType);
-			if(parentMetadata == null) {
-				ObjectFlow.tbmdContext.put(superType, parentMetadata = new ClassFlow(superType));
-			}
+			ClassDescribe parentMetadata = getDescribe(superType);
 			this.parent = parentMetadata;
 		}
 		/**------------------E BUG2433(Jerremy 2018.06.19)------------------*/
@@ -125,21 +128,21 @@ public class ClassFlow {
 		return constructor;
 	}
 	
-	public FieldFlow [] getRequiredFields() {
-		List<FieldFlow> fields = new ArrayList<>();
-		ClassFlow md = this;
+	public FieldDescribe [] getRequiredFields() {
+		List<FieldDescribe> fields = new ArrayList<>();
+		ClassDescribe md = this;
 		for(;md != null;) {
 			if(ArrayObjects.assertArrayNotEmpty(md.requiredFields)) {
 				fields.addAll(Arrays.asList(md.requiredFields));
 			}
 			md = md.parent;
 		}
-		return ArrayCollect.get(FieldFlow.class).toArray(fields);
+		return ArrayCollect.get(FieldDescribe.class).toArray(fields);
 	}
 	
 	public Method [] getDeclaredMethods() {
 		List<Method> methods = new ArrayList<>();
-		ClassFlow md = this;
+		ClassDescribe md = this;
 		for(;md != null;) {
 			for(java.util.Map.Entry<String, Method []> en : md.declaredMethods.entrySet()) {
 				methods.addAll(Arrays.asList(en.getValue()));
@@ -151,7 +154,7 @@ public class ClassFlow {
 	
 	public Method [] getDeclaredMethod(String methodName) {
 		List<Method> methods = new ArrayList<>();
-		ClassFlow md = this;
+		ClassDescribe md = this;
 		for(;md != null;) {
 			Method [] tmp = md.declaredMethods.get(methodName);
 			if(ArrayObjects.assertArrayNotEmpty(tmp)) {
@@ -164,7 +167,7 @@ public class ClassFlow {
 	
 	public String [] getFieldNames() {
 		List<String> result = new ArrayList<>();
-		ClassFlow md = this;
+		ClassDescribe md = this;
 		while(md != null){
 			result.addAll(md.fields.keySet());
 			md = md.parent;
@@ -172,27 +175,27 @@ public class ClassFlow {
 		return ArrayCollect.STRING.toArray(result);
 	}
 	
-	public FieldFlow [] getFiledArray(){
-		List<FieldFlow> result = new ArrayList<>();
-		ClassFlow md = this;
+	public FieldDescribe [] getFiledArray(){
+		List<FieldDescribe> result = new ArrayList<>();
+		ClassDescribe md = this;
 		while(md != null){
 			result.addAll(md.fields.values());
 			md = md.parent;
 		}
-		return result.toArray(new FieldFlow [0]);
+		return result.toArray(new FieldDescribe [0]);
 	}
 	
-	public FieldFlow getField(String name){
-		ClassFlow md = this;
-		FieldFlow f = md.fields.get(name); 
+	public FieldDescribe getField(String name){
+		ClassDescribe md = this;
+		FieldDescribe f = md.fields.get(name); 
 		while(f == null && (md = md.parent) != null){
 			f = md.fields.get(name); 
 		}
 		return f;
 	}
 	
-	Object unsafeNewInstance() throws Throwable{
-		return unsafe.allocateInstance(type);
+	public Object unsafeNewInstance() throws Throwable{
+		return Unsafe.getUnsafe().allocateInstance(type);
 	}
 	
 	public Object newInstance() throws Throwable{
@@ -211,7 +214,7 @@ public class ClassFlow {
 				return type.newInstance();
 			} catch (Throwable e2) {
 				try {
-					return unsafe.allocateInstance(type);
+					return Unsafe.getUnsafe().allocateInstance(type);
 				} catch (Throwable e3) {
 					throw e3;
 				}

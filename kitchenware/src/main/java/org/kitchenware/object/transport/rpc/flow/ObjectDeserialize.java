@@ -16,13 +16,15 @@ import java.util.logging.Logger;
 
 import org.kitchenware.express.util.Errors;
 import org.kitchenware.reflect.ArrayMemory;
+import org.kitchenware.reflect.basic.ClassDescribe;
+import org.kitchenware.reflect.basic.FieldDescribe;
 
 
 public class ObjectDeserialize extends ObjectFlow{
 	static final Logger logger = Logger.getLogger(ObjectDeserialize.class.getName());
 	
 	final Map<Integer, Class> classDataMap = new HashMap<>();
-	final Map<Integer, FieldFlow> fieldDataMap = new HashMap<>();
+	final Map<Integer, FieldDescribe> fieldDataMap = new HashMap<>();
 	final Map<Integer, Object> objectDataMap = new HashMap<>();
 	
 	Object obj;
@@ -126,7 +128,7 @@ public class ObjectDeserialize extends ObjectFlow{
 			}else if (type == OBJECT) {
 				int classIndex = bits.getInt(in);
 				Class objectType = classDataMap.get(classIndex);
-				ClassFlow md = getToyBoxMetadata(objectType);
+				ClassDescribe md = ClassDescribe.getDescribe(objectType);
 //				result = md.newInstance();
 				result = null;
 				if(md != null) {
@@ -141,7 +143,7 @@ public class ObjectDeserialize extends ObjectFlow{
 				Object fieldObj;
 				Integer fieldIndex;
 				Integer fieldObjIndex;
-				FieldFlow field;
+				FieldDescribe field;
 				for (int i = 0; i < fieldListSize; i++) {
 					//field
 					fieldIndex = bits.getInt(in);
@@ -314,16 +316,16 @@ public class ObjectDeserialize extends ObjectFlow{
 			Integer index = bits.getInt(in);
 			Integer classid = bits.getInt(in);
 			
-			ClassFlow md = null;
+			ClassDescribe md = null;
 			Class type = classDataMap.get(classid);
 			if(type != null) {
-				md = ObjectFlow.getToyBoxMetadata(classDataMap.get(classid));
+				md = ClassDescribe.getDescribe(classDataMap.get(classid));
 			}
 			byte [] buf = new byte [bits.getInt(in)];
 			in.read(buf);
 			
 			if(md != null) {
-				FieldFlow f = md.getField(new String(buf, "utf8"));
+				FieldDescribe f = md.getField(new String(buf, "utf8"));
 				if(f != null){
 					fieldDataMap.put(index, f);
 				}

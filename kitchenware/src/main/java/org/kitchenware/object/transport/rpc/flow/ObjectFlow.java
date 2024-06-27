@@ -269,20 +269,6 @@ public abstract class ObjectFlow {
 		return tmp.substring(0, index);
 	}
 	
-	final static Map<Class, ClassFlow> tbmdContext = new ConcurrentHashMap<>();
-	
-	public static ClassFlow getToyBoxMetadata(
-			@NotNull Class clazz){
-		if(clazz == null) {
-			return null;
-		}
-		ClassFlow md = tbmdContext.get(clazz);
-		if (md == null) {
-			tbmdContext.put(clazz, md = new ClassFlow(clazz));
-		}
-		return md;
-	}
-	
 	public static final Class loadClass(String typeName) throws Throwable{
 		
 		return ClassBufferedFactory.getFactory().forName(typeName);

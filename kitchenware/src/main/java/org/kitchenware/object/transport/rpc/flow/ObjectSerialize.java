@@ -19,11 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.kitchenware.express.util.Errors;
 import org.kitchenware.reflect.ArrayMemory;
+import org.kitchenware.reflect.basic.ClassDescribe;
+import org.kitchenware.reflect.basic.FieldDescribe;
 
 public class ObjectSerialize extends ObjectFlow {
 	// final Map<Object, Integer> typeDataMap = new HashMap<Object, Integer>();
 	final Map<Class, Integer> classDataMap = new HashMap<Class, Integer>();
-	final Map<FieldFlow, Integer> fieldDataMap = new HashMap<FieldFlow, Integer>();
+	final Map<FieldDescribe, Integer> fieldDataMap = new HashMap<FieldDescribe, Integer>();
 	final Map<Object, Integer> objectDataMap;
 
 	// final AtomicInteger typeIndex = new AtomicInteger(0);
@@ -117,9 +119,9 @@ public class ObjectSerialize extends ObjectFlow {
 					Object fieldObj;
 					Integer fieldIndex;
 					Integer fieldObjIndex;
-					List<FieldFlow> preparedFields = new ArrayList<>();
+					List<FieldDescribe> preparedFields = new ArrayList<>();
 					List<Object> preparedFieldValue = new ArrayList<>();
-					for (FieldFlow f : getToyBoxMetadata(clazz).getFiledArray()) {
+					for (FieldDescribe f : ClassDescribe.getDescribe(clazz).getFiledArray()) {
 						fieldObj = f.get(src);
 						if (fieldObj == null) {
 							continue;
@@ -130,7 +132,7 @@ public class ObjectSerialize extends ObjectFlow {
 					// field list size;
 					bits.putInt(objectDataOut, preparedFields.size());
 					for (int i = 0; i < preparedFields.size(); i ++) {
-						FieldFlow f = preparedFields.get(i);
+						FieldDescribe f = preparedFields.get(i);
 						
 						fieldIndex = fieldDataMap.get(f);
 						// field
@@ -322,14 +324,14 @@ public class ObjectSerialize extends ObjectFlow {
 			bits.putByteArray(classesOut, classNameBuf);
 		}
 		if (type == OBJECT) {
-			for (FieldFlow f : getToyBoxMetadata(clazz).getFiledArray()) {
+			for (FieldDescribe f : ClassDescribe.getDescribe(clazz).getFiledArray()) {
 				builField(index, f);
 			}
 		}
 		return index;
 	}
 
-	private final int builField(int classIndex, FieldFlow f) throws Throwable {
+	private final int builField(int classIndex, FieldDescribe f) throws Throwable {
 		Integer index = fieldDataMap.get(f);
 		if (index == null) {
 			fieldDataMap.put(f, index = fieldIndex.getAndIncrement());

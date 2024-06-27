@@ -1,4 +1,4 @@
-package org.kitchenware.object.transport.rpc.flow;
+package org.kitchenware.reflect.basic;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -11,7 +11,7 @@ import org.kitchenware.reflect.InstanceAllocator;
 import org.kitchenware.reflect.Setter;
 import org.kitchenware.reflect.SetterFactory;
 
-public class FieldFlow {
+public class FieldDescribe {
 	final Field field;
 	final long offset;
 	final Getter getter;
@@ -20,7 +20,7 @@ public class FieldFlow {
 	final boolean required;
 	final boolean requiredAndNotEmpty;
 	
-	FieldFlow(Field field){
+	FieldDescribe(Field field){
 		this.field = field;
 		this.hash = field.hashCode();
 		this.offset = InstanceAllocator.fieldOffSet(field);
@@ -60,10 +60,10 @@ public class FieldFlow {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(!FieldFlow.class.isInstance(obj)) {
+		if(!FieldDescribe.class.isInstance(obj)) {
 			return false;
 		}
-		FieldFlow target = (FieldFlow) obj;
+		FieldDescribe target = (FieldDescribe) obj;
 		boolean result = Objects.equals(this.field, target.field);
 		return result;
 	}
