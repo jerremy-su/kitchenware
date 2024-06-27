@@ -7,30 +7,30 @@ import java.util.logging.Logger;
 
 import org.kitchenware.express.annotation.NotNull;
 import org.kitchenware.network.netty.NettyTCPChannelStatement;
-import org.kitchenware.network.netty.http.async.NettyHttpAsyncCallback;
+import org.kitchenware.network.netty.http.async.HttpAsyncCallback;
 import org.kitchenware.network.tcp.TCPChannelOption;
 
-public class DefaultNettyHttpSession {
+public class HttpSession {
 	
-	static final Logger LOGGER = Logger.getLogger(DefaultNettyHttpSession.class.getName());
+	static final Logger LOGGER = Logger.getLogger(HttpSession.class.getName());
 	
 	final CountDownLatch cdl = new CountDownLatch(1);
 	final CountDownLatch ackLock = new CountDownLatch(1);
 	
-	final DefaultNettyHttpRequest request;
-	final DefaultNettyHttpResopnse response;
+	final HttpRequest request;
+	final HttpResopnse response;
 	final TCPChannelOption option;
 	final NettyTCPChannelStatement statement;
 	boolean doAck;
 	
-	NettyHttpAsyncCallback asyncCallback;
+	HttpAsyncCallback asyncCallback;
 	
-	DefaultNettyHttpSession(
+	HttpSession(
 			boolean doAck
 			, NettyTCPChannelStatement statement
 			, TCPChannelOption option
-			, DefaultNettyHttpRequest request
-			, @NotNull DefaultNettyHttpResopnse response
+			, HttpRequest request
+			, @NotNull HttpResopnse response
 			){
 		this.doAck = doAck;
 		this.statement = statement;
@@ -43,11 +43,11 @@ public class DefaultNettyHttpSession {
 		return cdl;
 	}
 	
-	public DefaultNettyHttpResopnse getResponse() {
+	public HttpResopnse getResponse() {
 		return response;
 	}
 	
-	public DefaultNettyHttpRequest getRequest() {
+	public HttpRequest getRequest() {
 		return request;
 	}
 	
@@ -96,9 +96,9 @@ public class DefaultNettyHttpSession {
 		return result;
 	}
 	
-	public DefaultNettyHttpSession asyncCallback(NettyHttpAsyncCallback handler) {
+	public HttpSession asyncCallback(HttpAsyncCallback handler) {
 		this.asyncCallback = handler;
-		return DefaultNettyHttpSession.this;
+		return HttpSession.this;
 	}
 
 }

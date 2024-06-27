@@ -1,6 +1,6 @@
 package org.kitchenware.network.netty.http;
 
-public enum DefaultNettyHttpProtocol {
+public enum HttpProtocol {
 
 	/**
 	 *HTTP/1.0 

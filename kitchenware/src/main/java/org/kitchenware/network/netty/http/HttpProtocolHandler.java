@@ -24,16 +24,16 @@ import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
 
-public final class DefaultHttpNettyProtocolHandler implements NettyProtocolHandler{
+public final class HttpProtocolHandler implements NettyProtocolHandler{
 	static final boolean DEBUG = BoolObjects.valueOf(System.getProperty("debug"));
-	static DefaultHttpNettyProtocolHandler handler = new DefaultHttpNettyProtocolHandler();
+	static HttpProtocolHandler handler = new HttpProtocolHandler();
 	
 	static int MAX_H2_BUF_LEN = 10 * 1024 * 1024;
 	
-	static DefaultHttpNettyProtocolHandler getHandler() {
+	static HttpProtocolHandler getHandler() {
 		return handler;
 	}
-	private DefaultHttpNettyProtocolHandler() {}
+	private HttpProtocolHandler() {}
 	
 	@Override
 	public void installChannel(NettyTCPChannelStatement statement, Channel channel, ChannelPipeline pipeline) throws Exception {
@@ -88,12 +88,12 @@ public final class DefaultHttpNettyProtocolHandler implements NettyProtocolHandl
 	
 	private void _readHttp1(NettyTCPChannelStatement statement, ChannelHandlerContext ctx, Object msg)
 			throws Exception {
-		DefaultNettyHttpSession session = statement.getConnection().getAttachment(ctx.channel(), DefaultNettyHttpSession.class);
+		HttpSession session = statement.getConnection().getAttachment(ctx.channel(), HttpSession.class);
 		if (session == null) {
 			throw new IllegalAccessException("Http session not bound");
 		}
 		
-		DefaultNettyHttpResopnse response = session.getResponse();
+		HttpResopnse response = session.getResponse();
 		if (HttpResponse.class.isInstance(msg)) {
 			HttpResponse x = (HttpResponse) msg;
 			response.buffHeader(x.headers());
@@ -125,7 +125,7 @@ public final class DefaultHttpNettyProtocolHandler implements NettyProtocolHandl
 	@Override
 	public void exceptionCaught(NettyTCPConnection connection, NettyTCPChannelStatement statement,  ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		//-------------
-		DefaultNettyHttpSession session = connection.getAttachment(ctx.channel(), DefaultNettyHttpSession.class);
+		HttpSession session = connection.getAttachment(ctx.channel(), HttpSession.class);
 		if (session == null) {
 			return;
 		}
@@ -136,7 +136,7 @@ public final class DefaultHttpNettyProtocolHandler implements NettyProtocolHandl
 	@Override
 	public void inactive(NettyTCPConnection connection, NettyTCPChannelStatement statement, ChannelHandlerContext ctx) throws Exception {
 		//--------------
-		DefaultNettyHttpSession session = connection.getAttachment(ctx.channel(), DefaultNettyHttpSession.class);
+		HttpSession session = connection.getAttachment(ctx.channel(), HttpSession.class);
 		if (session == null) {
 			return;
 		}

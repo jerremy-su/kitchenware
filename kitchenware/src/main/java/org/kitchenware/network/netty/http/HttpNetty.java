@@ -16,7 +16,7 @@ import org.kitchenware.network.errors.ConnectionResetException;
 import org.kitchenware.network.netty.NettyTCPChannelStatement;
 import org.kitchenware.network.netty.NettyTCPConenctionFactory;
 import org.kitchenware.network.netty.NettyTCPConnection;
-import org.kitchenware.network.netty.http.async.NettyHttpAsyncCallback;
+import org.kitchenware.network.netty.http.async.HttpAsyncCallback;
 import org.kitchenware.network.proxy.ProxyAgent;
 import org.kitchenware.network.proxy.ProxyConfiguration;
 import org.kitchenware.network.tcp.TCPChannelOption;
@@ -30,10 +30,10 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 
-public final class DefaultNettyHttpProtocolFunction {
+public final class HttpNetty {
 	
 	static final boolean DEBUG = BoolObjects.valueOf(System.getProperty("debug"));
-	static final Logger LOGGER = Logger.getLogger(DefaultNettyHttpProtocolFunction.class.getName());
+	static final Logger LOGGER = Logger.getLogger(HttpNetty.class.getName());
 	
 	static HttpHeaders emptyHerders = new DefaultHttpHeaders();
 	static TCPChannelOption defaultTCPOption = new TCPChannelOption();
@@ -42,10 +42,10 @@ public final class DefaultNettyHttpProtocolFunction {
 	static final int DEFAULT_SSL_PORT= 443;
 	
 	final NettyTCPConnection connection;
-	final DefaultNettyHttpRequest request;
+	final HttpRequest request;
 	final boolean ssl;
 	String hostReference;
-	DefaultNettyHttpProtocol protocol;
+	HttpProtocol protocol;
 	boolean doAck;
 	/**
 	 * @param socketAddress
@@ -54,15 +54,15 @@ public final class DefaultNettyHttpProtocolFunction {
 	 * @param method
 	 */
 	@Deprecated
-	public DefaultNettyHttpProtocolFunction(InetSocketAddress socketAddress, boolean ssl, String path, HttpMethod method) {
+	public HttpNetty(InetSocketAddress socketAddress, boolean ssl, String path, HttpMethod method) {
 		
 		String protocol = ssl ? "https" : "http";
 		
 		this.connection = NettyTCPConenctionFactory.getOwner().openConnection(ssl, socketAddress, null);
-		if (!DefaultHttpNettyProtocolHandler.class.isInstance(connection.getProtocolHandler())) {
-			connection.setProtocolHandler(DefaultHttpNettyProtocolHandler.getHandler());
+		if (!HttpProtocolHandler.class.isInstance(connection.getProtocolHandler())) {
+			connection.setProtocolHandler(HttpProtocolHandler.getHandler());
 		}
-		this.request = new DefaultNettyHttpRequest(HttpVersion.HTTP_1_1, method, path);
+		this.request = new HttpRequest(HttpVersion.HTTP_1_1, method, path);
 		this.ssl = ssl;
 		
 		String host = socketAddress.getHostString();
@@ -77,7 +77,7 @@ public final class DefaultNettyHttpProtocolFunction {
 		request.head(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text().toString(), protocol);
 	}
 	
-	public DefaultNettyHttpProtocolFunction(URI uri, HttpMethod method) {
+	public HttpNetty(URI uri, HttpMethod method) {
 		String protocol = uri.getScheme();
 		if (!"https".equalsIgnoreCase(protocol) && !"http".equalsIgnoreCase(protocol)) {
 			throw new RuntimeException(String.format("Illegal protocol : %s", protocol));
@@ -102,8 +102,8 @@ public final class DefaultNettyHttpProtocolFunction {
 			this.hostReference += ":" + originalPort;
 		}
 		this.connection = NettyTCPConenctionFactory.getOwner().openConnection(ssl, HostNamingFactory.owner().socketAddress(host, port), ProxyAgent.select(uri));
-		if (!DefaultHttpNettyProtocolHandler.class.isInstance(connection.getProtocolHandler())) {
-			connection.setProtocolHandler(DefaultHttpNettyProtocolHandler.getHandler());
+		if (!HttpProtocolHandler.class.isInstance(connection.getProtocolHandler())) {
+			connection.setProtocolHandler(HttpProtocolHandler.getHandler());
 		}
 		
 		String path = uri.getRawPath();
@@ -117,53 +117,53 @@ public final class DefaultNettyHttpProtocolFunction {
 			pathBuf.append("?").append(uri.getRawQuery());
 		}
 		
-		this.request = new DefaultNettyHttpRequest(HttpVersion.HTTP_1_1, method, pathBuf.toString());
+		this.request = new HttpRequest(HttpVersion.HTTP_1_1, method, pathBuf.toString());
 		
 		request.head(HttpHeaderNames.HOST.toString(), hostReference);
 		request.head(HttpHeaderNames.CONNECTION.toString(), HttpHeaderNames.KEEP_ALIVE.toString());
 		request.head(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text().toString(), protocol);
 	}
 	
-	public DefaultNettyHttpProtocolFunction doAck(boolean ack) {
+	public HttpNetty doAck(boolean ack) {
 		this.doAck = ack;
-		return DefaultNettyHttpProtocolFunction.this;
+		return HttpNetty.this;
 	}
 	
 	public boolean isDoAck() {
 		return doAck;
 	}
 	
-	public DefaultNettyHttpProtocolFunction protocol(DefaultNettyHttpProtocol protocol) {
+	public HttpNetty protocol(HttpProtocol protocol) {
 		this.protocol = protocol;
-		return DefaultNettyHttpProtocolFunction.this;
+		return HttpNetty.this;
 	}
 	
-	public DefaultNettyHttpProtocolFunction head(String key, String value) {
+	public HttpNetty head(String key, String value) {
 		request.head(key, value);
-		return DefaultNettyHttpProtocolFunction.this;
+		return HttpNetty.this;
 	}
 	
-	public DefaultNettyHttpProtocolFunction contentType(String type) {
+	public HttpNetty contentType(String type) {
 		request.head(HttpHeaderNames.CONTENT_TYPE.toString(), type);
-		return DefaultNettyHttpProtocolFunction.this;
+		return HttpNetty.this;
 	}
 	
-	public DefaultNettyHttpProtocolFunction contentLength(long len) {
+	public HttpNetty contentLength(long len) {
 		request.head(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(len));
-		return DefaultNettyHttpProtocolFunction.this;
+		return HttpNetty.this;
 	}
 	
-	public DefaultNettyHttpProtocolFunction content(byte [] b) throws IOException {
+	public HttpNetty content(byte [] b) throws IOException {
 		request.content(b);
 		contentLength(b.length);
-		return DefaultNettyHttpProtocolFunction.this;
+		return HttpNetty.this;
 	}
 	
 	public byte [] loadContent() {
 		return request.loadContent();
 	}
 
-	public DefaultNettyHttpResopnse invokeIO() throws IOException{
+	public HttpResopnse invokeIO() throws IOException{
 		try {
 			return invoke(defaultTCPOption);
 		} catch (Throwable e) {
@@ -171,7 +171,7 @@ public final class DefaultNettyHttpProtocolFunction {
 		}
 	}
 	
-	public DefaultNettyHttpResopnse invokeIO(TCPChannelOption option) throws IOException{
+	public HttpResopnse invokeIO(TCPChannelOption option) throws IOException{
 		try {
 			return invoke(option);
 		} catch (Throwable e) {
@@ -179,14 +179,14 @@ public final class DefaultNettyHttpProtocolFunction {
 		}
 	}
 	
-	public DefaultNettyHttpResopnse invoke() throws Throwable{
+	public HttpResopnse invoke() throws Throwable{
 		return invoke(defaultTCPOption);
 	}
 	
 	
-	public DefaultNettyHttpResopnse invoke(TCPChannelOption option) throws Throwable{
+	public HttpResopnse invoke(TCPChannelOption option) throws Throwable{
 		
-		DefaultNettyHttpSession session = connect(option);
+		HttpSession session = connect(option);
 		NettyTCPChannelStatement statement = session.getStatement();
 		
 		if(this.doAck) {
@@ -234,11 +234,11 @@ public final class DefaultNettyHttpProtocolFunction {
 		return session.getResponse();
 	}
 	
-	public DefaultNettyHttpSession invokeAsyncIO(@NotNull NettyHttpAsyncCallback callback) throws IOException{
+	public HttpSession invokeAsyncIO(@NotNull HttpAsyncCallback callback) throws IOException{
 		return this.invokeAsyncIO(defaultTCPOption, callback);
 	}
 	
-	public DefaultNettyHttpSession invokeAsyncIO(@NotNull TCPChannelOption option, @NotNull NettyHttpAsyncCallback callback) throws IOException{
+	public HttpSession invokeAsyncIO(@NotNull TCPChannelOption option, @NotNull HttpAsyncCallback callback) throws IOException{
 		try {
 			return invokeAsync(option, callback);
 		} catch (Throwable e) {
@@ -247,20 +247,20 @@ public final class DefaultNettyHttpProtocolFunction {
 		
 	}
 	
-	public DefaultNettyHttpSession invokeAsync(@NotNull TCPChannelOption option, @NotNull NettyHttpAsyncCallback callback) throws Throwable{
+	public HttpSession invokeAsync(@NotNull TCPChannelOption option, @NotNull HttpAsyncCallback callback) throws Throwable{
 		if(callback == null) {
 			throw new IOException("Callback Cannot be null.");
 		}
-		DefaultNettyHttpSession session = connect(option, callback);
+		HttpSession session = connect(option, callback);
 		return session;
 	}
 	
 	
-	DefaultNettyHttpSession connect(TCPChannelOption option) throws Throwable{
+	HttpSession connect(TCPChannelOption option) throws Throwable{
 		return this.connect(option, null);
 	}
 	
-	DefaultNettyHttpSession connect(TCPChannelOption option, NettyHttpAsyncCallback asyncCallback) throws Throwable{
+	HttpSession connect(TCPChannelOption option, HttpAsyncCallback asyncCallback) throws Throwable{
 		option = option.cloneOption();
 		
 		ProxyConfiguration proxy = option.getProxy();
@@ -277,17 +277,17 @@ public final class DefaultNettyHttpProtocolFunction {
 		}
 		
 		if(this.protocol != null
-				&& !Objects.equals(DefaultNettyHttpProtocol.H2, this.protocol)) {
+				&& !Objects.equals(HttpProtocol.H2, this.protocol)) {
 			option.setAlpnInTls(false);
 		}
 		
 		NettyTCPChannelStatement statement = connection.openTCPChannelStatement(ssl, option);
-		DefaultNettyHttpSession session = new DefaultNettyHttpSession(
+		HttpSession session = new HttpSession(
 				this.doAck
 				, statement
 				, option
 				, request
-				, new DefaultNettyHttpResopnse(statement)
+				, new HttpResopnse(statement)
 				);
 		
 		if(asyncCallback != null) {
@@ -334,7 +334,7 @@ public final class DefaultNettyHttpProtocolFunction {
 		return this.connection;
 	}
 	
-	public DefaultNettyHttpRequest getRequestEntity() {
+	public HttpRequest getRequestEntity() {
 		return request;
 	}
 	
@@ -342,39 +342,39 @@ public final class DefaultNettyHttpProtocolFunction {
 		return this.request.getHeaders();
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doGet(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.GET);
+	public static HttpNetty doGet(URI uri) {
+		return new HttpNetty(uri, HttpMethod.GET);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doOptions(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.OPTIONS);
+	public static HttpNetty doOptions(URI uri) {
+		return new HttpNetty(uri, HttpMethod.OPTIONS);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doHead(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.HEAD);
+	public static HttpNetty doHead(URI uri) {
+		return new HttpNetty(uri, HttpMethod.HEAD);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doPost(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.POST);
+	public static HttpNetty doPost(URI uri) {
+		return new HttpNetty(uri, HttpMethod.POST);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doPut(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.PUT);
+	public static HttpNetty doPut(URI uri) {
+		return new HttpNetty(uri, HttpMethod.PUT);
 	}
 
-	public static DefaultNettyHttpProtocolFunction doPatch(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.PATCH);
+	public static HttpNetty doPatch(URI uri) {
+		return new HttpNetty(uri, HttpMethod.PATCH);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doDelete(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.DELETE);
+	public static HttpNetty doDelete(URI uri) {
+		return new HttpNetty(uri, HttpMethod.DELETE);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doTrace(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.TRACE);
+	public static HttpNetty doTrace(URI uri) {
+		return new HttpNetty(uri, HttpMethod.TRACE);
 	}
 	
-	public static DefaultNettyHttpProtocolFunction doConnect(URI uri) {
-		return new DefaultNettyHttpProtocolFunction(uri, HttpMethod.CONNECT);
+	public static HttpNetty doConnect(URI uri) {
+		return new HttpNetty(uri, HttpMethod.CONNECT);
 	}
 }
