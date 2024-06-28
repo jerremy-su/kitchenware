@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import org.kitchenware.express.annotation.NotNull;
+import org.kitchenware.express.annotation.Optional;
 import org.kitchenware.express.io.ByteBufferedInputStream;
 import org.kitchenware.express.io.ByteBufferedOutputStream;
 import org.kitchenware.network.netty.http.HttpNetty;
@@ -25,7 +26,7 @@ public class ServiceRPCHandler extends MethodInvokerHandler{
 	final Class serviceType;
 	ServiceRPCHandler(
 			@NotNull final ServiceRPC rpc
-			, @NotNull final String serviceName
+			, @Optional final String serviceName
 			, @NotNull Class serviceType
 			){
 		this.rpc = rpc;
