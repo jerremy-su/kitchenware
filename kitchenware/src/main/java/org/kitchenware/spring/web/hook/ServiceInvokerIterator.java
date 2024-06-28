@@ -2,8 +2,8 @@ package org.kitchenware.spring.web.hook;
 
 import org.kitchenware.express.annotation.NotNull;
 
-public interface SpringServiceInvokerIterator {
+public interface ServiceInvokerIterator {
 
 	boolean invokeNext(
-			@NotNull SpringServiceHook hook) throws Exception;
+			@NotNull ServiceHook hook) throws Exception;
 }

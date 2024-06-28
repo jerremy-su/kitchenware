@@ -2,11 +2,11 @@ package org.kitchenware.spring.web.hook;
 
 import org.kitchenware.express.annotation.Required;
 
-public class SpringServiceInvokerResult {
+public class ServiceInvokerResult {
 
 	/**
 	 * UUID
-	 * @see org.kitchenware.spring.web.hook.SpringServiceInvokerTransport#transportId
+	 * @see org.kitchenware.spring.web.hook.ServiceInvokerTransport#transportId
 	 */
 	@Required
 	String transportId;
@@ -19,18 +19,18 @@ public class SpringServiceInvokerResult {
 		return result;
 	}
 
-	public SpringServiceInvokerResult setResult(Object result) {
+	public ServiceInvokerResult setResult(Object result) {
 		this.result = result;
-		return SpringServiceInvokerResult.this;
+		return ServiceInvokerResult.this;
 	}
 
 	public Throwable getCaughtError() {
 		return caughtError;
 	}
 
-	public SpringServiceInvokerResult setCaughtError(Throwable caughtError) {
+	public ServiceInvokerResult setCaughtError(Throwable caughtError) {
 		this.caughtError = caughtError;
-		return SpringServiceInvokerResult.this;
+		return ServiceInvokerResult.this;
 	}
 
 }
