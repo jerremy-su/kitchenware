@@ -9,5 +9,4 @@ public interface SpringServiceHook {
 	
 	HttpServletResponse httpResponse();
 	
-	
 }

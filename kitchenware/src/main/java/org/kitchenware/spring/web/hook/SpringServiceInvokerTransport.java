@@ -1,5 +1,6 @@
 package org.kitchenware.spring.web.hook;
 
+import org.kitchenware.express.annotation.Optional;
 import org.kitchenware.express.annotation.Required;
 import org.kitchenware.reflect.MethodId;
 
@@ -11,12 +12,11 @@ public class SpringServiceInvokerTransport {
 	@Required
 	String transportId;
 
-	/**
-	 * if #mappingServiceName == true: serviceMapping = @Service({$name) if
-	 * #mappingServiceName == false: serviceMapping = Service.class.getName()
-	 */
+	@Optional
+	String serviceName;
+
 	@Required
-	String serviceMapping;
+	String serviceType;
 
 	@Required
 	boolean mappingServiceName;
@@ -26,15 +26,6 @@ public class SpringServiceInvokerTransport {
 
 	@Required
 	Object[] parameters;
-
-	public String getServiceMapping() {
-		return serviceMapping;
-	}
-
-	public SpringServiceInvokerTransport setServiceMapping(String serviceMapping) {
-		this.serviceMapping = serviceMapping;
-		return SpringServiceInvokerTransport.this;
-	}
 
 	public boolean isMappingServiceName() {
 		return mappingServiceName;
@@ -69,6 +60,24 @@ public class SpringServiceInvokerTransport {
 
 	public SpringServiceInvokerTransport setTransportId(String transportId) {
 		this.transportId = transportId;
+		return SpringServiceInvokerTransport.this;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public SpringServiceInvokerTransport setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+		return SpringServiceInvokerTransport.this;
+	}
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public SpringServiceInvokerTransport setServiceType(String serviceType) {
+		this.serviceType = serviceType;
 		return SpringServiceInvokerTransport.this;
 	}
 
