@@ -15,6 +15,7 @@ import org.kitchenware.express.annotation.NotNull;
 import org.kitchenware.express.util.ArrayCollect;
 import org.kitchenware.express.util.ArrayObjects;
 import org.kitchenware.express.util.EmptyArray;
+import org.kitchenware.reflect.MethodId;
 
 import sun.misc.Unsafe;
 
@@ -40,7 +41,7 @@ public class ClassDescribe {
 	final Map<String, FieldDescribe> fields = new LinkedHashMap<String, FieldDescribe>();
 	final FieldDescribe [] requiredFields;
 	
-	final Map<String, Method [] > declaredMethods = new LinkedHashMap<>();
+	final Map<MethodId, Method> declaredMethods = new LinkedHashMap<>();
 	
 	final boolean typeInterface;
 	final boolean typeArray;
@@ -79,32 +80,29 @@ public class ClassDescribe {
 			} catch (Throwable e) {}
 		}
 		Class superType = type.getSuperclass();
-		/**------------------B BUG2433(Jerremy 2018.06.19)------------------*/
 		if (superType != null ) {
 			ClassDescribe parentMetadata = getDescribe(superType);
 			this.parent = parentMetadata;
 		}
-		/**------------------E BUG2433(Jerremy 2018.06.19)------------------*/
 		
-		if(!this.type.isArray()){
-			Map<String, List<Method>> methods = new LinkedHashMap<>();
-			for(Method m : this.type.getDeclaredMethods()) {
-				if(Modifier.isStatic(m.getModifiers())) {
-					continue;
-				}
-				
-				List<Method> tmp = methods.get(m.getName());
-				if(tmp == null) {
-					methods.put(m.getName(), tmp = new ArrayList<>());
-				}
-				tmp.add(m);
-			}
-			
-			methods.forEach((name, ms) -> {
-				this.declaredMethods.put(
-						name, ArrayCollect.get(Method.class).toArray(ms));
-			});
+		installMethods();
+	}
+	
+	private void installMethods() {
+		if(this.typeArray) {
+			return;
 		}
+		Method [] methods;
+		if(this.typeInterface) {
+			methods = this.type.getMethods();
+		}else {
+			methods = this.type.getDeclaredMethods();
+		}
+		
+		ArrayObjects.foreach(methods, (i, method)->{
+			MethodId id = MethodId.getId(method);
+			this.declaredMethods.put(id, method);
+		});
 	}
 	
 	private void remodifyFieldFinalProperty(Object src){
@@ -141,28 +139,41 @@ public class ClassDescribe {
 	}
 	
 	public Method [] getDeclaredMethods() {
-		List<Method> methods = new ArrayList<>();
-		ClassDescribe md = this;
-		for(;md != null;) {
-			for(java.util.Map.Entry<String, Method []> en : md.declaredMethods.entrySet()) {
-				methods.addAll(Arrays.asList(en.getValue()));
-			}
-			md = md.parent;
+		
+		Class type = this.type;
+		Map<MethodId, Method> methods = new LinkedHashMap<>();
+		
+		for(;type != null;) {
+			Map<MethodId, Method> typeMethods = getDescribe(type).declaredMethods;
+			typeMethods.forEach((id, method) -> {
+				if(methods.containsKey(id)) {
+					return;
+				}
+				methods.put(id, method);
+			});
+			type = type.getSuperclass();
 		}
-		return ArrayCollect.get(Method.class).toArray(methods);
+		
+		return ArrayCollect.get(Method.class).toArray(methods.values());
 	}
 	
-	public Method [] getDeclaredMethod(String methodName) {
-		List<Method> methods = new ArrayList<>();
-		ClassDescribe md = this;
-		for(;md != null;) {
-			Method [] tmp = md.declaredMethods.get(methodName);
-			if(ArrayObjects.assertArrayNotEmpty(tmp)) {
-				methods.addAll(Arrays.asList(tmp));
-			}
-			md = md.parent;
+	public Method getDeclaredMethod(
+			@NotNull MethodId id) {
+		if(id == null) {
+			return null;
 		}
-		return ArrayCollect.get(Method.class).toArray(methods);
+		
+		Method method = null;
+		
+		Class type = this.type;
+		for(;method == null && type != null;) {
+			ClassDescribe typeDescribe = getDescribe(type);
+			method = typeDescribe.declaredMethods.get(id);
+			if(method == null) {
+				type = type.getSuperclass();
+			}
+		}
+		return method;
 	}
 	
 	public String [] getFieldNames() {
