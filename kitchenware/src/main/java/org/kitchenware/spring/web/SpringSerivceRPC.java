@@ -1,5 +1,5 @@
 package org.kitchenware.spring.web;
 
-public class SpringSerivceEndpoint {
+public class SpringSerivceRPC {
 
 }
