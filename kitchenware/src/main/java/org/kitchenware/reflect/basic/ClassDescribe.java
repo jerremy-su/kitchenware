@@ -78,27 +78,35 @@ public class ClassDescribe {
 		}else{
 			componentType = null;
 			List<FieldDescribe> requiredFields = new ArrayList<>();
-			for (Field f : type.getDeclaredFields()) {
-				if (Modifier.isStatic(f.getModifiers())
-						|| (!type.getPackage().equals(jutilPackage) && Modifier.isTransient(f.getModifiers()))) {
-					continue;
-				}
-				if (Modifier.isFinal(f.getModifiers())) {
-					remodifyFieldFinalProperty(f);
-				}
-				f.setAccessible(true);
-				FieldDescribe field = new FieldDescribe(f);
-				fields.put(f.getName(), field);
-				if(field.isRequired()) {
-					requiredFields.add(field);
+			
+			if(! typeInterface) {
+				//install constructor
+				try {
+					Constructor constructor = type.getDeclaredConstructor();
+					constructor.setAccessible(true);
+					this.constructor = constructor;
+				} catch (Throwable e) {}
+				
+				//install fields
+				for (Field f : type.getDeclaredFields()) {
+					if (Modifier.isStatic(f.getModifiers())
+							|| (!type.getPackage().equals(jutilPackage) && Modifier.isTransient(f.getModifiers()))) {
+						continue;
+					}
+					if (Modifier.isFinal(f.getModifiers())) {
+						remodifyFieldFinalProperty(f);
+					}
+					f.setAccessible(true);
+					FieldDescribe field = new FieldDescribe(f);
+					fields.put(f.getName(), field);
+					if(field.isRequired()) {
+						requiredFields.add(field);
+					}
 				}
 			}
+			
 			this.requiredFields = ArrayCollect.get(FieldDescribe.class).toArray(requiredFields);
-			try {
-				Constructor constructor = type.getDeclaredConstructor();
-				constructor.setAccessible(true);
-				this.constructor = constructor;
-			} catch (Throwable e) {}
+			
 		}
 		Class superType = type.getSuperclass();
 		if (superType != null ) {
