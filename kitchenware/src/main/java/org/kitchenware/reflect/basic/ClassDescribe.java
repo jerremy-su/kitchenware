@@ -10,8 +10,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.kitchenware.express.annotation.NotNull;
+import org.kitchenware.express.concurrent.ConcurrentLockFactory;
 import org.kitchenware.express.util.ArrayCollect;
 import org.kitchenware.express.util.ArrayObjects;
 import org.kitchenware.express.util.EmptyArray;
@@ -19,19 +23,37 @@ import org.kitchenware.reflect.MethodId;
 import org.kitchenware.unsafe.Unsafe;
 
 public class ClassDescribe {
+	static final Logger LOGGER = Logger.getLogger(ClassDescribe.class.getName());
+	
 	static final Package jutilPackage = Package.getPackage("java.util");
 	
 	final static Map<Class, ClassDescribe> tbmdContext = new ConcurrentHashMap<>();
+	final static ConcurrentLockFactory LOCKS = new ConcurrentLockFactory();
 	
 	public static ClassDescribe getDescribe(
 			@NotNull Class clazz){
 		if(clazz == null) {
 			return null;
 		}
+		
 		ClassDescribe md = tbmdContext.get(clazz);
-		if (md == null) {
-			tbmdContext.put(clazz, md = new ClassDescribe(clazz));
+		if(md != null) {
+			return md;
 		}
+		
+		Lock lock = LOCKS.get(clazz);
+		lock.lock();
+		try {
+			md = tbmdContext.get(clazz);
+			if(md == null) {
+				tbmdContext.put(clazz, md = new ClassDescribe(clazz));
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
+		}finally {
+			lock.unlock();
+		}
+		
 		return md;
 	}
 	
