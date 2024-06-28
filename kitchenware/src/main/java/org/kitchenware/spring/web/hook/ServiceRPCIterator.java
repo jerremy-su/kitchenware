@@ -72,9 +72,13 @@ public class ServiceRPCIterator implements ServiceInvokeIterator{
 				e = InvocationTargetException.class.cast(e).getTargetException();
 			}
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
-			
+			invokerResult = new ServiceInvokeResult()
+					.setTransportId(transportId)
+					.setCaughtError(e)
+					;
 		}
 		
+		writeObject(hook, invokerResult);
 		return false;
 	}
 	

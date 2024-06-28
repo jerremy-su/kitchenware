@@ -42,36 +42,18 @@ public abstract class MethodInvokerHandler implements InvocationHandler,
 		}
 		Throwable availableException = null;
 		try {
-			return performInvoke(owner, method, args);/**BUG11551(Jerremy 2017.02.17)*/
-		} catch (Throwable e) {/**BUG11325(Jerremy 2016.11.22)*/
-			/**------------------B BUGjira1427(Jerremy 2018.02.06)------------------*/
-//			if (InvocationTargetException.class.isInstance(e)) {
-//				InvocationTargetException ex = (InvocationTargetException) e;
-//				if (ex.getTargetException() != null) {
-//					availableException = ex.getTargetException();
-//				}
-//			}
-//			if (availableException == null) {
-//				availableException = e;
-//			}
+			return performInvoke(owner, method, args);
+		} catch (Throwable e) {
 			availableException = getCurrentThrowable(e);
-			/**------------------E BUGjira1427(Jerremy 2018.02.06)------------------*/
 		}
-		{// ���쳣���п����Դ���
+		{
 			if (validThrowables(method, availableException)) {
 				throw availableException;
 			} else {
-				/**------------------B BUG11438(Jerremy 2017.01.06)------------------*/
-//				RuntimeException throwRuntime = new RuntimeException(
-//						String.format("%s : %s", availableException.getClass()
-//								.getName(), availableException.getMessage()), availableException);/**BUG11163(Jerremy 2016.09.02)*/
-//				throwRuntime.setStackTrace(availableException.getStackTrace());
 				throw Errors.throwRuntimeable(availableException);
-				/**------------------E BUG11438(Jerremy 2017.01.06)------------------*/
 			}
 		}
 	}
-	/**------------------B BUGjira1427(Jerremy 2018.02.06)------------------*/
 	private Throwable getCurrentThrowable(Throwable ex){
 		while((ex.getCause() != null && 
 				(ex instanceof InvocationTargetException || ex.getClass().toString().toLowerCase().contains("ejbexception")))){
@@ -80,25 +62,23 @@ public abstract class MethodInvokerHandler implements InvocationHandler,
 		return ex;
 		
 	}
-	/**------------------E BUGjira1427(Jerremy 2018.02.06)------------------*/
+	
 	protected abstract Object performInvoke(Object owner, Method method,
 			Object[] args) throws Throwable;
 
 	boolean validThrowables(Method method, Throwable e) {
-		/**------------------B BUG11551(Jerremy 2017.02.17)------------------*/
 		if(RuntimeException.class.isInstance(e)){
 			return true;
 		}
 		if(method == null){
 			return false;
 		}
-		/**------------------E BUG11551(Jerremy 2017.02.17)------------------*/
 		Class[] eTypes = method.getExceptionTypes();
 		if (eTypes.length < 1) {
 			return false;
 		}
 		for (Class c : eTypes) {
-			if (c.isInstance(e)) {/**BUG11163(Jerremy 2016.09.02)*//**BUG11551(Jerremy 2017.02.17)*/
+			if (c.isInstance(e)) {
 				return true;
 			}
 		}
