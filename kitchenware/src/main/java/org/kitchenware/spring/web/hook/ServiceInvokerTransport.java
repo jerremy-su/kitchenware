@@ -19,22 +19,10 @@ public class ServiceInvokerTransport {
 	String serviceType;
 
 	@Required
-	boolean mappingServiceName;
-
-	@Required
 	MethodId methodId;
 
 	@Required
 	Object[] parameters;
-
-	public boolean isMappingServiceName() {
-		return mappingServiceName;
-	}
-
-	public ServiceInvokerTransport setMappingServiceName(boolean mappingServiceName) {
-		this.mappingServiceName = mappingServiceName;
-		return ServiceInvokerTransport.this;
-	}
 
 	public MethodId getMethodId() {
 		return methodId;

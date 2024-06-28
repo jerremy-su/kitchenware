@@ -12,6 +12,8 @@ public interface ServiceInvokeIterator {
 
 	static final Logger LOGGER = Logger.getLogger(ServiceInvokeIterator.class.getName());
 	
+	static final String STREAM_TYPE = "application/octet-stream";
+	
 	boolean invokeNext(
 			@NotNull final ServiceHook hook) throws Exception;
 	
@@ -30,7 +32,7 @@ public interface ServiceInvokeIterator {
 			@NotNull final ServiceHook hook, @NotNull final Object src) throws Exception{
 		try {
 			HttpServletResponse response = hook.httpResponse();
-			response.setContentType("application/octet-stream");
+			response.setContentType(STREAM_TYPE);
 			ObjectSerialize serialize = new ObjectSerialize(src);
 			serialize.writeObject(hook.httpResponse().getOutputStream());
 			response.flushBuffer();
