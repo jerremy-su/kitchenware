@@ -16,8 +16,7 @@ import org.kitchenware.express.util.ArrayCollect;
 import org.kitchenware.express.util.ArrayObjects;
 import org.kitchenware.express.util.EmptyArray;
 import org.kitchenware.reflect.MethodId;
-
-import sun.misc.Unsafe;
+import org.kitchenware.unsafe.Unsafe;
 
 public class ClassDescribe {
 	static final Package jutilPackage = Package.getPackage("java.util");
