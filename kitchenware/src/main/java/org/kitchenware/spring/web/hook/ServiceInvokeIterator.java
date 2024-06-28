@@ -8,27 +8,32 @@ import javax.servlet.http.HttpServletResponse;
 import org.kitchenware.express.annotation.NotNull;
 import org.kitchenware.object.transport.rpc.flow.ObjectSerialize;
 
-public interface ServiceInvokerIterator {
+public interface ServiceInvokeIterator {
 
-	static final Logger LOGGER = Logger.getLogger(ServiceInvokerIterator.class.getName());
+	static final Logger LOGGER = Logger.getLogger(ServiceInvokeIterator.class.getName());
 	
 	boolean invokeNext(
 			@NotNull final ServiceHook hook) throws Exception;
 	
-	default boolean throwErrorReponse(
-			@NotNull final ServiceHook hook, @NotNull final Throwable caughtError) throws Exception{
+	default void throwErrorReponse(
+			@NotNull final String transportId, @NotNull final ServiceHook hook, @NotNull final Throwable caughtError) throws Exception{
 		
-		ServiceInvokerResult result = new ServiceInvokerResult()
+		ServiceInvokeResult result = new ServiceInvokeResult()
+				.setTransportId(transportId)
 				.setCaughtError(caughtError)
 				;
 		
+		writeObject(hook, result);
+	}
+	
+	default void writeObject(
+			@NotNull final ServiceHook hook, @NotNull final Object src) throws Exception{
 		try {
 			HttpServletResponse response = hook.httpResponse();
 			response.setContentType("application/octet-stream");
-			ObjectSerialize serialize = new ObjectSerialize(result);
+			ObjectSerialize serialize = new ObjectSerialize(src);
 			serialize.writeObject(hook.httpResponse().getOutputStream());
 			response.flushBuffer();
-			return true;
 		} catch (Throwable e) {
 			throw new IOException(e.getMessage(), e);
 		}

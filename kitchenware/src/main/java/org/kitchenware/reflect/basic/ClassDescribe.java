@@ -234,6 +234,10 @@ public class ClassDescribe {
 		return f;
 	}
 	
+	public Class getType() {
+		return type;
+	}
+	
 	public Object unsafeNewInstance() throws Throwable{
 		return Unsafe.getUnsafe().allocateInstance(type);
 	}
