@@ -1,13 +1,16 @@
 package org.kitchenware.spring.web;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.kitchenware.express.annotation.NotNull;
 import org.kitchenware.express.annotation.Optional;
 import org.kitchenware.express.io.ByteBufferedInputStream;
 import org.kitchenware.express.io.ByteBufferedOutputStream;
+import org.kitchenware.express.util.StringObjects;
 import org.kitchenware.network.netty.http.HttpNetty;
 import org.kitchenware.network.netty.http.HttpResopnse;
 import org.kitchenware.object.transport.rpc.flow.ObjectDeserialize;
@@ -19,6 +22,9 @@ import org.kitchenware.spring.web.hook.ServiceInvokeResult;
 import org.kitchenware.spring.web.hook.ServiceInvokerTransport;
 
 public class ServiceRPCHandler extends MethodInvokerHandler{
+	
+	static final Logger LOGGER = Logger.getLogger(ServiceRPCHandler.class.getName());
+	
 
 	final ServiceRPC rpc;
 	
@@ -70,17 +76,25 @@ public class ServiceRPCHandler extends MethodInvokerHandler{
 		
 		ObjectSerialize serialize = new ObjectSerialize(iterator);
 		ByteBufferedOutputStream buf = new ByteBufferedOutputStream();
-		serialize.equals(buf);
+		serialize.writeObject(buf);
 		
 		http.content(buf.toByteArray());
 		HttpResopnse response = http.invoke(this.rpc.connectionOption);
 		
-		ObjectDeserialize deserialize = new ObjectDeserialize(
-				new ByteBufferedInputStream(response.getContent())
-				);
 		
-		ServiceInvokeResult result = deserialize.readObject();
-		return result;
+		try {
+			ObjectDeserialize deserialize = new ObjectDeserialize(
+					new ByteBufferedInputStream(response.getContent())
+					);
+			
+			ServiceInvokeResult result = deserialize.readObject();
+			return result;
+		} catch (Throwable e) {
+			String err = String.format("Invalid Response: \r\n%s"
+					, StringObjects.toUTF8String(response.getContent()));
+			LOGGER.warning(err);
+			throw new IOException(e.getMessage(), e);
+		}
 	}
 	
 }

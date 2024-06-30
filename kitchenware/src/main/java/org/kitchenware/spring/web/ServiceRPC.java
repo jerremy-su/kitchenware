@@ -46,7 +46,7 @@ public class ServiceRPC {
 		}
 		
 		Service service = serviceType.getAnnotation(Service.class);
-		if(StringObjects.assertNotEmpty(service.value())) {
+		if(service != null && StringObjects.assertNotEmpty(service.value())) {
 			
 			return getService(serviceType, service.value());
 		}

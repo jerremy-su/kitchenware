@@ -38,12 +38,12 @@ public interface TesterService {
 	
 	@Service
 	static class TesterServiceImpl implements TesterService{
-
+		
 		@Override
 		public TesterResponse transport(TesterRequest request) throws Exception {
 			TesterResponse response = new TesterResponse();
 			if(request != null) {
-				response.setReciveEndpoint(response.getReciveEndpoint());
+				response.setReciveEndpoint(request.getEndpoint());
 			}
 			return response;
 		}
