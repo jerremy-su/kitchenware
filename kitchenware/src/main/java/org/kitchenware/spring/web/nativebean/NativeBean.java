@@ -62,7 +62,7 @@ public class NativeBean {
 			@NotNull final Object bean, @NotNull final FieldDescribe field, @NotNull final Impl impl) throws Exception{
 		Class implType = impl.value();
 		
-		if(! implType.isAssignableFrom(field.getType())) {
+		if(! field.getType().isAssignableFrom(implType)) {
 			throw new IllegalAccessException(String.format("Failed resolve field: %s", field.getField().toGenericString()));
 		}
 		
