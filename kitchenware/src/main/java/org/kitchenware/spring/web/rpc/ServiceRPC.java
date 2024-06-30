@@ -1,4 +1,4 @@
-package org.kitchenware.spring.web;
+package org.kitchenware.spring.web.rpc;
 
 import java.net.URI;
 import java.util.Map;

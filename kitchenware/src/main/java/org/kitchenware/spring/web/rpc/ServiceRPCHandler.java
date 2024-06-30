@@ -1,4 +1,4 @@
-package org.kitchenware.spring.web;
+package org.kitchenware.spring.web.rpc;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

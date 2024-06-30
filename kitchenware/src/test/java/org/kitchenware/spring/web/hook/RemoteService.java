@@ -5,7 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.kitchenware.spring.web.ServiceRPC;
+import org.kitchenware.spring.web.rpc.ServiceRPC;
 import org.springframework.stereotype.Service;
 
 public interface RemoteService {
