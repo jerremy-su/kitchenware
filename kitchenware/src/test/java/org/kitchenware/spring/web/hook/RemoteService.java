@@ -8,7 +8,7 @@ import java.util.Date;
 import org.kitchenware.spring.web.ServiceRPC;
 import org.springframework.stereotype.Service;
 
-public interface TesterService {
+public interface RemoteService {
 
 	static class TesterRequest {
 		String endpoint;
@@ -17,9 +17,9 @@ public interface TesterService {
 			return endpoint;
 		}
 
-		public TesterService.TesterRequest setEndpoint(String endpoint) {
+		public RemoteService.TesterRequest setEndpoint(String endpoint) {
 			this.endpoint = endpoint;
-			return TesterService.TesterRequest.this;
+			return RemoteService.TesterRequest.this;
 		}
 
 	}
@@ -31,16 +31,16 @@ public interface TesterService {
 			return reciveEndpoint;
 		}
 
-		public TesterService.TesterResponse setReciveEndpoint(String reciveEndpoint) {
+		public RemoteService.TesterResponse setReciveEndpoint(String reciveEndpoint) {
 			this.reciveEndpoint = reciveEndpoint;
-			return TesterService.TesterResponse.this;
+			return RemoteService.TesterResponse.this;
 		}
 	}
 	
 	TesterResponse transport(TesterRequest request) throws Exception;
 	
 	@Service
-	static class TesterServiceImpl implements TesterService{
+	static class TesterServiceImpl implements RemoteService{
 		
 		@Override
 		public TesterResponse transport(TesterRequest request) throws Exception {
@@ -62,7 +62,7 @@ public interface TesterService {
 			ServiceRPC rpc = new ServiceRPC(uri);
 			
 			//这是一个 @Service
-			TesterService shell = rpc.getService(TesterService.class);
+			RemoteService shell = rpc.getService(RemoteService.class);
 			
 			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 			
