@@ -1,6 +1,9 @@
 package org.kitchenware.spring.web.hook;
 
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.kitchenware.spring.web.ServiceRPC;
 import org.springframework.stereotype.Service;
@@ -49,15 +52,27 @@ public interface TesterService {
 		}
 		
 		public static void main(String[] args) throws Throwable{
-			ServiceRPC rpc = new ServiceRPC(new URI("http://localhost:8081/test/rpc/hook/invoke"));
+			
+			/**
+			 * 初始化一个@Controller作为数据传输地址
+			 * */
+			URI uri = new URI("http://localhost:8081/test/rpc/hook/invoke");
+			
+			//初始化远程调用
+			ServiceRPC rpc = new ServiceRPC(uri);
+			
+			//这是一个 @Service
 			TesterService shell = rpc.getService(TesterService.class);
 			
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			
+			//执行远程调用
 			TesterRequest request = new TesterRequest()
-					.setEndpoint("http://localhost")
+					.setEndpoint(String.format("[%s]:  把消息还给我", formatter.format(new Date())))
 					;
 			
 			TesterResponse response = shell.transport(request);
-			System.out.println("Recieve URL: " + response.getReciveEndpoint());
+			System.out.println("丢回来的消息: " + response.getReciveEndpoint());
 		}
 	}
 }
