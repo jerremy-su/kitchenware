@@ -38,6 +38,10 @@ public class FieldDescribe {
 		return field;
 	}
 	
+	public Class getType() {
+		return this.field.getType();
+	}
+	
 	public String getName() {
 		return this.field.getName();
 	}

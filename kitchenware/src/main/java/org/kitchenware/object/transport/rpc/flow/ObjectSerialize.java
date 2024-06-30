@@ -121,7 +121,7 @@ public class ObjectSerialize extends ObjectFlow {
 					Integer fieldObjIndex;
 					List<FieldDescribe> preparedFields = new ArrayList<>();
 					List<Object> preparedFieldValue = new ArrayList<>();
-					for (FieldDescribe f : ClassDescribe.getDescribe(clazz).getFiledArray()) {
+					for (FieldDescribe f : ClassDescribe.getDescribe(clazz).getFields()) {
 						fieldObj = f.get(src);
 						if (fieldObj == null) {
 							continue;
@@ -324,7 +324,7 @@ public class ObjectSerialize extends ObjectFlow {
 			bits.putByteArray(classesOut, classNameBuf);
 		}
 		if (type == OBJECT) {
-			for (FieldDescribe f : ClassDescribe.getDescribe(clazz).getFiledArray()) {
+			for (FieldDescribe f : ClassDescribe.getDescribe(clazz).getFields()) {
 				builField(index, f);
 			}
 		}

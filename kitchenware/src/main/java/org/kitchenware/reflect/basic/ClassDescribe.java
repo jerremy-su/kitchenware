@@ -215,7 +215,7 @@ public class ClassDescribe {
 		return ArrayCollect.STRING.toArray(result);
 	}
 	
-	public FieldDescribe [] getFiledArray(){
+	public FieldDescribe [] getFields(){
 		List<FieldDescribe> result = new ArrayList<>();
 		ClassDescribe md = this;
 		while(md != null){
