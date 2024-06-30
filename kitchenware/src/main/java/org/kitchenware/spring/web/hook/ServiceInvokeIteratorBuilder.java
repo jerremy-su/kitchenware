@@ -4,7 +4,7 @@ import org.kitchenware.express.annotation.NotNull;
 
 public interface ServiceInvokeIteratorBuilder {
 
-	static final DefaultServiceInvokeIteratorBuilder DEFUALT = new DefaultServiceInvokeIteratorBuilder();
+	static final ServiceInvokeIteratorBuilder DEFUALT = new DefaultServiceInvokeIteratorBuilder();
 	
 	ServiceInvokeIterator buildIterator(
 			@NotNull final ServiceInvokerTransport transport
