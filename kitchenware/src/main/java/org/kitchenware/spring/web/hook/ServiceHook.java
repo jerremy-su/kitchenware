@@ -38,7 +38,7 @@ public interface ServiceHook {
 		@Required
 		final ApplicationContext applicationContext;
 		
-		DefaultServiceHook(
+		public DefaultServiceHook(
 				@NotNull final HttpServletRequest request
 				, @NotNull final HttpServletResponse response
 				, @NotNull final ApplicationContext applicationContext
