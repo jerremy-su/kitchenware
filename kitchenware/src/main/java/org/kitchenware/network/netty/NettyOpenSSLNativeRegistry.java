@@ -3,12 +3,17 @@ package org.kitchenware.network.netty;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import org.kitchenware.express.util.StringObjects;
 
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 public class NettyOpenSSLNativeRegistry {
+	static final Logger LOGGER = Logger.getLogger(NettyOpenSSLNativeRegistry.class.getName());
+	
 	static boolean isInitial;
 	public synchronized static void loadTcNative() throws Exception {
 		if(isInitial) return;
@@ -45,8 +50,9 @@ public class NettyOpenSSLNativeRegistry {
 			try {
 				NettyNativeLibraryLoader.load(name, loader);
 				return;
-			} catch (Throwable t) {
-				t.printStackTrace();
+			} catch (Throwable e) {
+				String err = StringObjects.format("Failed to load native lib: %s", e.getMessage());
+				LOGGER.warning(err);
 			}
 		}
 	}
