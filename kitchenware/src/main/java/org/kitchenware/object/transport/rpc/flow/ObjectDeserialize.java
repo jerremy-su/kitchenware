@@ -22,6 +22,7 @@ import org.kitchenware.reflect.basic.FieldDescribe;
 
 public class ObjectDeserialize extends ObjectFlow{
 	static final Logger logger = Logger.getLogger(ObjectDeserialize.class.getName());
+	static final String DEFAULT_ERROR = "Invalid Body";
 	
 	final Map<Integer, Class> classDataMap = new HashMap<>();
 	final Map<Integer, FieldDescribe> fieldDataMap = new HashMap<>();
@@ -34,7 +35,7 @@ public class ObjectDeserialize extends ObjectFlow{
 	final FlowBits bits = new FlowBits();
 	public ObjectDeserialize(InputStream in) throws Throwable{
 		if(bits.getShort(in) != VERSION_0 ) {
-			throw new IllegalAccessException("Not a toybox marshaller.");
+			throw new IllegalAccessException(DEFAULT_ERROR);
 		}
 		this.version = bits.getShort(in);
 		if (
@@ -42,7 +43,7 @@ public class ObjectDeserialize extends ObjectFlow{
 				&& version != VERSION_A1
 				&& version != VERSION_A2
 				) {
-			throw new IllegalAccessException("Not a toybox marshaller.");
+			throw new IllegalAccessException(DEFAULT_ERROR);
 		}
 		int len;
 		byte [] buf;
