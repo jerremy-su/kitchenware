@@ -10,7 +10,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
-public class HttpRequest {
+public class NettyHttpRequest {
 
 	final HttpHeaders headers = new DefaultHttpHeaders();
 	final HttpMethod method;
@@ -20,7 +20,7 @@ public class HttpRequest {
 	String path;
 
 
-	public HttpRequest(HttpVersion protocolVersion, HttpMethod method, String path) {
+	public NettyHttpRequest(HttpVersion protocolVersion, HttpMethod method, String path) {
 		this.protocolVersion = protocolVersion;
 		this.method = method;
 		this.path = path;
@@ -39,16 +39,16 @@ public class HttpRequest {
 		}
 	}
 	
-	public HttpRequest head(String key, String value) {
+	public NettyHttpRequest head(String key, String value) {
 		headers.set(key, value);
-		return HttpRequest.this;
+		return NettyHttpRequest.this;
 	}
 
-	public HttpRequest content(byte[] b) throws IOException {
+	public NettyHttpRequest content(byte[] b) throws IOException {
 		unlimitBuff = new ByteArrayOutputStream();
 		unlimitBuff.write(b);
 		unlimitBuff.flush();
-		return HttpRequest.this;
+		return NettyHttpRequest.this;
 	}
 	
 	public HttpHeaders getHeaders() {

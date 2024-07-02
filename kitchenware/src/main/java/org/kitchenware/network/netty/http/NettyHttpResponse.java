@@ -15,7 +15,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
-public class HttpResopnse {
+public class NettyHttpResponse {
 	Throwable caughtError;
 	HttpHeaders headers;
 	ByteArrayOutputStream unlimitBuff = new ByteArrayOutputStream();
@@ -27,7 +27,7 @@ public class HttpResopnse {
 	
 	NettyTCPChannelStatement statement;
 	
-	public HttpResopnse(NettyTCPChannelStatement statement){
+	public NettyHttpResponse(NettyTCPChannelStatement statement){
 		this.statement = statement;
 	}
 	

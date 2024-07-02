@@ -17,8 +17,8 @@ public class HttpSession {
 	final CountDownLatch cdl = new CountDownLatch(1);
 	final CountDownLatch ackLock = new CountDownLatch(1);
 	
-	final HttpRequest request;
-	final HttpResopnse response;
+	final NettyHttpRequest request;
+	final NettyHttpResponse response;
 	final TCPChannelOption option;
 	final NettyTCPChannelStatement statement;
 	boolean doAck;
@@ -29,8 +29,8 @@ public class HttpSession {
 			boolean doAck
 			, NettyTCPChannelStatement statement
 			, TCPChannelOption option
-			, HttpRequest request
-			, @NotNull HttpResopnse response
+			, NettyHttpRequest request
+			, @NotNull NettyHttpResponse response
 			){
 		this.doAck = doAck;
 		this.statement = statement;
@@ -43,11 +43,11 @@ public class HttpSession {
 		return cdl;
 	}
 	
-	public HttpResopnse getResponse() {
+	public NettyHttpResponse getResponse() {
 		return response;
 	}
 	
-	public HttpRequest getRequest() {
+	public NettyHttpRequest getRequest() {
 		return request;
 	}
 	

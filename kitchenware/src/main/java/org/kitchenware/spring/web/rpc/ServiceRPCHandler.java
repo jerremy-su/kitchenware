@@ -12,7 +12,7 @@ import org.kitchenware.express.io.ByteBufferedInputStream;
 import org.kitchenware.express.io.ByteBufferedOutputStream;
 import org.kitchenware.express.util.StringObjects;
 import org.kitchenware.network.netty.http.HttpNetty;
-import org.kitchenware.network.netty.http.HttpResopnse;
+import org.kitchenware.network.netty.http.NettyHttpResponse;
 import org.kitchenware.object.transport.rpc.flow.ObjectDeserialize;
 import org.kitchenware.object.transport.rpc.flow.ObjectSerialize;
 import org.kitchenware.object.transport.rpc.invocation.MethodInvokerHandler;
@@ -85,7 +85,7 @@ public class ServiceRPCHandler extends MethodInvokerHandler{
 		serialize.writeObject(buf);
 		
 		http.content(buf.toByteArray());
-		HttpResopnse response = http.invoke(this.rpc.connectionOption);
+		NettyHttpResponse response = http.invoke(this.rpc.connectionOption);
 		
 		
 		try {

@@ -42,7 +42,7 @@ public final class HttpNetty {
 	static final int DEFAULT_SSL_PORT= 443;
 	
 	final NettyTCPConnection connection;
-	final HttpRequest request;
+	final NettyHttpRequest request;
 	final boolean ssl;
 	String hostReference;
 	HttpProtocol protocol;
@@ -62,7 +62,7 @@ public final class HttpNetty {
 		if (!HttpProtocolHandler.class.isInstance(connection.getProtocolHandler())) {
 			connection.setProtocolHandler(HttpProtocolHandler.getHandler());
 		}
-		this.request = new HttpRequest(HttpVersion.HTTP_1_1, method, path);
+		this.request = new NettyHttpRequest(HttpVersion.HTTP_1_1, method, path);
 		this.ssl = ssl;
 		
 		String host = socketAddress.getHostString();
@@ -117,7 +117,7 @@ public final class HttpNetty {
 			pathBuf.append("?").append(uri.getRawQuery());
 		}
 		
-		this.request = new HttpRequest(HttpVersion.HTTP_1_1, method, pathBuf.toString());
+		this.request = new NettyHttpRequest(HttpVersion.HTTP_1_1, method, pathBuf.toString());
 		
 		request.head(HttpHeaderNames.HOST.toString(), hostReference);
 		request.head(HttpHeaderNames.CONNECTION.toString(), HttpHeaderNames.KEEP_ALIVE.toString());
@@ -163,7 +163,7 @@ public final class HttpNetty {
 		return request.loadContent();
 	}
 
-	public HttpResopnse invokeIO() throws IOException{
+	public NettyHttpResponse invokeIO() throws IOException{
 		try {
 			return invoke(defaultTCPOption);
 		} catch (Throwable e) {
@@ -171,7 +171,7 @@ public final class HttpNetty {
 		}
 	}
 	
-	public HttpResopnse invokeIO(TCPChannelOption option) throws IOException{
+	public NettyHttpResponse invokeIO(TCPChannelOption option) throws IOException{
 		try {
 			return invoke(option);
 		} catch (Throwable e) {
@@ -179,12 +179,12 @@ public final class HttpNetty {
 		}
 	}
 	
-	public HttpResopnse invoke() throws Throwable{
+	public NettyHttpResponse invoke() throws Throwable{
 		return invoke(defaultTCPOption);
 	}
 	
 	
-	public HttpResopnse invoke(TCPChannelOption option) throws Throwable{
+	public NettyHttpResponse invoke(TCPChannelOption option) throws Throwable{
 		
 		HttpSession session = connect(option);
 		NettyTCPChannelStatement statement = session.getStatement();
@@ -287,7 +287,7 @@ public final class HttpNetty {
 				, statement
 				, option
 				, request
-				, new HttpResopnse(statement)
+				, new NettyHttpResponse(statement)
 				);
 		
 		if(asyncCallback != null) {
@@ -334,7 +334,7 @@ public final class HttpNetty {
 		return this.connection;
 	}
 	
-	public HttpRequest getRequestEntity() {
+	public NettyHttpRequest getRequestEntity() {
 		return request;
 	}
 	

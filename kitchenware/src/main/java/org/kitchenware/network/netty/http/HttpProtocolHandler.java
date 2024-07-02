@@ -93,7 +93,7 @@ public final class HttpProtocolHandler implements NettyProtocolHandler{
 			throw new IllegalAccessException("Http session not bound");
 		}
 		
-		HttpResopnse response = session.getResponse();
+		NettyHttpResponse response = session.getResponse();
 		if (HttpResponse.class.isInstance(msg)) {
 			HttpResponse x = (HttpResponse) msg;
 			response.buffHeader(x.headers());

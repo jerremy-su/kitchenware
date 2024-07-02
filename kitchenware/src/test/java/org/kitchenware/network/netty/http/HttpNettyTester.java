@@ -8,7 +8,7 @@ public class HttpNettyTester {
 
 	public static void main(String[] args) throws Throwable{
 		String url = "https://www.baidu.com";
-		HttpResopnse response = HttpNetty
+		NettyHttpResponse response = HttpNetty
 		.doGet(new URI(url))
 		.invoke();
 		
