@@ -70,7 +70,7 @@ public class NativeBean {
 		if(Objects.equals(implType, this.implementsType)) {
 			nativeBean = this;
 		}else {
-			nativeBean = this.beanFactory.getBean(implType);
+			nativeBean = this.beanFactory.typeOf(implType);
 		}
 		
 		field.getField().set(bean, nativeBean.getBean());

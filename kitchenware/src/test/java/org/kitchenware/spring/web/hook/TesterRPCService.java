@@ -54,7 +54,7 @@ public interface TesterRPCService {
 			NativeBeanFactory beanFactory = new NativeBeanFactory(rpc);
 			
 			TesterRPCService shell = beanFactory
-					.getBean(TesterRPCService.TesterRPCServiceImpl.class)
+					.typeOf(TesterRPCService.TesterRPCServiceImpl.class)
 					.getBean();
 			
 			shell.executeToken();

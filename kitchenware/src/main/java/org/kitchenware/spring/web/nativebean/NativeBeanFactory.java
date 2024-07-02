@@ -32,7 +32,7 @@ public class NativeBeanFactory {
 		this.rpcSupported = this.serviceRPC != null;
 	}
 	
-	public NativeBean getBean(Class type) {
+	public NativeBean typeOf(Class type) {
 		NativeBean bean = this.BEANS.get(type);
 		if(bean != null) {
 			return bean;
