@@ -73,6 +73,12 @@ public class ServiceRPCHandler extends MethodInvokerHandler{
 				.doPost(uri)
 				.contentType(ServiceInvokeIterator.STREAM_TYPE)
 				;
+		ServiceRPCConnection connectionHandler = this.rpc.connectionHandler;
+		if(connectionHandler != null) {
+			connectionHandler.handleConnection(
+					ServiceRPCConnection.newConnection(http)
+					);
+		}
 		
 		ObjectSerialize serialize = new ObjectSerialize(iterator);
 		ByteBufferedOutputStream buf = new ByteBufferedOutputStream();

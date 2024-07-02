@@ -21,6 +21,7 @@ public class ServiceRPC {
 	static final Logger LOGGER = Logger.getLogger(ServiceRPC.class.getName());
 
 	transient ServiceInvokeIteratorBuilder iteratorBuilder = ServiceInvokeIteratorBuilder.DEFUALT;
+	transient ServiceRPCConnection connectionHandler;
 
 	final URI uri;
 
@@ -119,6 +120,15 @@ public class ServiceRPC {
 
 	public TCPChannelOption getConnectionOption() {
 		return connectionOption;
+	}
+	
+	public ServiceRPCConnection getConnectionHandler() {
+		return connectionHandler;
+	}
+	
+	public ServiceRPC setConnectionHandler(ServiceRPCConnection connectionHandler) {
+		this.connectionHandler = connectionHandler;
+		return ServiceRPC.this;
 	}
 
 }
