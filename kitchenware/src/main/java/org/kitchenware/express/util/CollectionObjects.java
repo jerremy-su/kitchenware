@@ -253,34 +253,6 @@ public class CollectionObjects {
 	}
 	
 
-	/**
-	 * 将长列拆分成多个一定长度的短列
-	 * 
-	 * @author Sdjen 2013-3-22 下午01:08:47
-	 * 
-	 * @param <E>
-	 * @param splitList
-	 * @param max 短列最大长度，最小为1
-	 * @return
-	 */
-	public static <E> List<List<E>> splitList(Collection<E> splitList, int max) {// [11055]sdjen20160803
-		List<List<E>> result = new ArrayList<List<E>>();
-		List<E> tempList = new ArrayList<E>();
-		for (E e : splitList) {
-			if(e == null) {
-				continue;
-			}
-			tempList.add(e);
-			if (tempList.size() >= max) {// 如果达到最大长度限制，
-				result.add(tempList);
-				tempList = new ArrayList<E>();
-			}
-		}
-		if (!tempList.isEmpty())// 若有剩余
-			result.add(tempList);
-		return result;
-	}// <<E BUG5937sdjen20130325
-	
 	public static int indexOf(Collection collection, Object src) {
 		Object [] arr = collection.toArray(new Object [0]);
 		for(int i = 0; i < arr.length; i ++) {

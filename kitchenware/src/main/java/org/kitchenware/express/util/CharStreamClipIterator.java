@@ -14,7 +14,7 @@ public class CharStreamClipIterator {
 		this.buff = buff;
 	}
 	
-	/**׷��char����
+	/**
 	 * @param b
 	 */
 	public void addBuff(char [] b){
@@ -76,14 +76,14 @@ public class CharStreamClipIterator {
 		return -1;
 	}
 	
-	/**��ȡʣ��δ�ü�������
+	/**
 	 * @return
 	 */
 	public char [] getCharArrays(){
 		return Arrays.copyOf(buff, buff.length);
 	}
 	
-	/**�����С
+	/**
 	 * @return
 	 */
 	public int size(){

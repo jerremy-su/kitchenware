@@ -46,7 +46,6 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 	}
 
 	/**
-	 * �Ӷ�����������
 	 * 
 	 * @param t
 	 */
@@ -77,7 +76,6 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 	}
 
 	/**
-	 * ���鳤��
 	 * 
 	 * @return
 	 */
@@ -95,7 +93,6 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 	}
 
 	/**
-	 * �������Ļ�������
 	 * 
 	 * @return
 	 */
@@ -104,7 +101,6 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 	}
 
 	/**
-	 * ���ص�ǰ����
 	 * 
 	 * @param <A>
 	 * @return
@@ -144,7 +140,6 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 		return true;
 	}
 
-	/** ------------------E BUG9194(Jerremy 2015.01.30)------------------ */
 	public Iterator<T> iterator() {
 		return new ArrayIterator<T>(array);
 	}
@@ -256,22 +251,7 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 		return numNew != 0;
 	}
 
-	public static void main(String[] args) {
-		ArrayBuilder<Object> b1 = ArrayBuilder.newArrayEntry(Object.class);
-		b1.add("1");
-		b1.add("2");
-		ArrayBuilder<Object> b2 = ArrayBuilder.newArrayEntry(Object.class);
-		b2.add("3");
-		b2.add("4");
-		b1.addAll(b2);
-		System.out.println(b1);
-		b1.remove(2);
-		System.out.println(b1);
-		System.out.println(b1.indexOf("2"));
-	}
-
 	/**
-	 * ��������󴴽����鴦����
 	 * 
 	 * @param <T>
 	 * @param array
@@ -282,7 +262,6 @@ public class ArrayBuilder<T> implements Iterable<T>, Serializable {
 	}
 
 	/**
-	 * ���̶����͵�������󴴽����鴦����
 	 * 
 	 * @param <T>
 	 * @param array
