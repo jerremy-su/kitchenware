@@ -134,11 +134,7 @@ public class StringMatchs {
 		}
 		
 		if(conditionsTemp.isEmpty()) {
-			if(StringObjects.isEmptyAfterTrim(string)) {
-				return true;
-			}else {
-				return false;
-			}
+			return true;
 		}
 
 		Deque<MatchCondition> conditionQueue = new LinkedList<>();
