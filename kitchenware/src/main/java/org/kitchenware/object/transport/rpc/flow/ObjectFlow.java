@@ -78,6 +78,7 @@ public abstract class ObjectFlow {
 		unsupportPackages = new String [] {
 				"javax.sql"
 				, "java.net"
+				, "java.util.concurrent.atomic"
 				};
 	}
 	
